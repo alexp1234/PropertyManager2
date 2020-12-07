@@ -1,0 +1,438 @@
+﻿@using PropertyManager.Models.Property
+@model List<InvestmentProperty>
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<!-- Grid row -->
+<div class="row" style="margin-bottom:15px;">
+    <div class="col-md-7">
+        <ul class="nav blue-gradient py-4 mb-md-0 mb-4 font-weight-bold z-depth-1">
+            <li class="nav-item" id="overview-li" style="background-color:white;">
+                <a id="overview-link" class="nav-link active" onclick="propertyTabNav('overview')">Overview</a>
+            </li>
+            <li class="nav-item" id="properties-li">
+                <a id="properties-link" class="nav-link white-text" onclick="propertyTabNav('properties')">Properties</a>
+            </li>
+            <li class="nav-item" id="maintenance-li">
+                <a id="maintenance-link" class="nav-link white-text" onclick="propertyTabNav('maintenance')">Maintenance</a>
+            </li>
+            <li class="nav-item" id="expenses-li">
+                <a id="expenses-link" class="nav-link white-text" onclick="propertyTabNav('expenses')">Expenses</a>
+            </li>
+            <li class="nav-item" id="profit-li">
+                <a id="profit-link" class="nav-link white-text" onclick="propertyTabNav('profit')">Profit</a>
+            </li>
+            <li class="nav-item" id="vacancies-li">
+                <a id="vacancies-link" class="nav-link white-text" onclick="propertyTabNav('vacancies')">Vacancies</a>
+            </li>
+            <li class="nav-item" id="loans-li">
+                <a id="loans-link" class="nav-link white-text" onclick="propertyTabNav('loans')">Loan Information</a>
+            </li>
+        </ul>
+    </div>
+  
+</div>
+<!-- Grid row -->
+<div id="property-list-box">
+    @if (Model.Count == 0)
+    {
+        <p>There are no properties to display</p>
+        @*<button class="btn btn-primary" id="add-property-button">Add Property</button>*@
+
+    }
+    else
+    {
+        <!-- Overview Tab-->
+        <div id="property-overview-div">
+            <div class="row">
+            <div class="col-md-5" style="margin-bottom:5%;">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Portfolio Value by Year</h5>
+                        <canvas id="value-by-year"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <a style="float:right;" onclick="propertyTabNav('properties')">Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5" style="margin-bottom:5%;">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Expenses by Property</h5>
+                        <canvas id="expenses-by-property"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <a style="float:right;" href="#">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-md-5" style="margin-bottom:5%">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Vacancy Percentage</h5>
+                            <canvas id="vacancy-chart"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" style="float:right;">Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5" style="margin-bottom:5%">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Loan Balance by Year</h5>
+                            <canvas id="loan-chart"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" style="float:right;">Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5" style="margin-bottom:5%;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Maintenance Requests by Property YTD</h5>
+                            <canvas id="maintenance-requests-chart"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <a style="float:right;" href="#">Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5" style="margin-bottom:5%;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Net profit per month</h5>
+                            <canvas id="profit-chart"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <a style="float:right;" href="#">Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- Properties Tab-->
+<div id="properties-div" style="display:none;">
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h2 class="display-4">Total Properties: @Model.Count</h2>
+            <p class="lead">Total Portfolio Value $@Model.Sum(m => m.CurrentMarketValue)</p>
+            <a href="" class="btn btn-default btn-rounded mb-4" data-toggle="modal" data-target="#modalContactForm" id="add-property-button">Add Property</a>
+            @Html.ActionLink("Download Full Report", "DownloadPropertyReport", "Export")
+        </div>
+
+    </div>
+    <!-- Search Bar-->
+    <div class="row">
+        <div class="search" style="margin-bottom:5%; margin-left:5%;"> <input id="property-search" type="text" onkeyup="search()" class="search-input" placeholder="Search properties" name=""> <a href="#" class="search-icon"> <i class="fa fa-search"></i> </a> </div>
+    </div>
+    <div class="row" id="property-cards-row">
+        @foreach (var property in Model)
+        {
+            <div class="col-md-4 property-card" id="@property.StreetAddress" style="margin-bottom: 5%;">
+                <div class="card" style="width:18rem;" id="card-@property.Id">
+                    <div class="card-body">
+                        <h5 class="card-title">@property.StreetAddress</h5>
+                        <p class="card-text">@property.City , @property.State</p>
+                    </div>
+                    <div class="card-footer">
+                        @*<button class="btn btn-danger" id="@property.Id" onclick="setPropertyToRemove('@property.Id')" data-toggle="modal" data-target="#modal-remove-property">Remove Property</button>*@
+                        @Html.ActionLink("Manage Property", "Details", "Property", new { propertyId = property.Id }, new { @class = "btn btn-secondary" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+        
+
+    }
+</div>
+
+
+<div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">Add Property</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mx-3">
+                <div class="md-form mb-5">
+                    <i class="fas fa-user prefix grey-text"></i>
+                    <input type="text" id="purchase-price" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="purchase-price">Purchase Price</label>
+                </div>
+
+                <div class="md-form mb-5">
+                    <i class="fas fa-envelope prefix grey-text"></i>
+                    <input type="text" id="current-market-value" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="current-market-value">Current Market Value</label>
+                </div>
+
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="state" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="state">State</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="city" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="city">City</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="street-address" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="street-address">Street Address</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="property-type" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="property-type">Property Type</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="purchase-date" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="purchase-date">Purchase Date</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="checkbox" id="is-rented" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="is-rented">Is the property currently rented?</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="current-rents" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="current-rents">Current rents per month</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-tag prefix grey-text"></i>
+                    <input type="text" id="market-rents" class="form-control validate" />
+                    <label data-error="wrong" data-success="right" for="market-rents">Market rate for rent per month</label>
+                </div>
+
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button class="btn btn-unique" id="add-property-save">Save <i class="fas fa-paper-plane-o ml-1"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-remove-property" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content modal-warning">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">Are you sure you want to permanently delete this property?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button class="btn btn-cyan" data-dismiss="modal">Back</button>
+                <button class="btn btn-danger" id="delete-property" onclick="removePropertyFromCard()">Delete <i class="fas fa-paper-plane-o ml-1"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<script>
+    function propertyTabNav(link) {
+        switch (link) {
+            case "overview":
+                $("#property-overview-div").css("display", "");                
+                $("#overview-li").css("background-color", "white");
+                $("#overview-link").removeClass("white-text");
+                removeAllButThis('overview');
+                break;
+            case "properties":
+                $("#properties-div").css("display", "");
+                $("#properties-li").css("background-color", "white");
+                $("#properties-link").removeClass("white-text");
+                removeAllButThis("properties");
+                break;
+        }
+    }
+
+    function removeAllButThis(activeItem) {
+        if (activeItem != "overview") {
+            $("#overview-li").css("background-color", "");
+            $("#overview-link").addClass("white-text");
+            $("#property-overview-div").css("display", "none");
+        }
+        if (activeItem != "properties") {
+            $("#properties-li").css("background-color", "");
+            $("#properties-link").addClass("white-text");
+            $("#properties-div").css("display", "none");
+        }
+        if (activeItem != "maintenance") {
+            $("#maintenance-li").css("background-color", "");
+            $("#maintenance-link").addClass("white-text");
+        }
+        if (activeItem != "expenses") {
+            $("#expenses-li").css("background-color", "");
+            $("#expenses-link").addClass("white-text");
+        }
+        if (activeItem != "profit") {
+            $("#profit-li").css("background-color", "");
+            $("#profit-link").addClass("white-text");
+        }
+        if (activeItem != "vacancies") {
+            $("#vacancies-li").css("background-color", "");
+            $("#vacancies-link").addClass("white-text");
+        }
+        if (activeItem != "loans") {
+            $("#loans-li").css("background-color", "");
+            $("#loans-link").addClass("white-text");
+        }
+
+
+    }
+
+    function search() {
+        var searchStr = $("#property-search").val();
+        var propertyCards = document.getElementsByClassName("property-card");
+        //console.log(propertyCards);
+        for (const c of propertyCards) {
+            var str = c.id;
+            if (!str.includes(searchStr)) {
+                $(c).css("display", "none");
+            }
+            else {
+                $(c).css("display", "");
+            }
+        }
+        
+    }
+    var ctx = document.getElementById('value-by-year').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: [ '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'],
+            datasets: [{
+                label: 'Value by year',
+                backgroundColor: '#a6c',
+                borderColor: '#a6c',
+                data: [50000, 100000, 200000, 300000, 400000, 500000, 600000, 850000, 900000, 1500000]
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+
+    var expensesChart = document.getElementById("expenses-by-property").getContext('2d');
+    var chart = new Chart(expensesChart, {
+        // The type of chart we want to create
+        type: 'bar',
+
+        // The data for our dataset
+        data: {
+            labels: ['property1', 'property2', 'property3', 'property4', 'property5'],
+            datasets: [{
+                label: 'YTD expenses by property Top 5:',
+                backgroundColor: '#a6c',
+                borderColor: '#a6c',
+                data: [500, 225, 115, 50, 27]
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+
+    var maintenanceChart = document.getElementById("maintenance-requests-chart").getContext('2d');
+    var chart = new Chart(maintenanceChart, {
+        // The type of chart we want to create
+        type: 'bar',
+
+        // The data for our dataset
+        data: {
+            labels: ['property1', 'property2', 'property3', 'property4', 'property5'],
+            datasets: [{
+                label: 'YTD maintenance requests by property Top 5:',
+                backgroundColor: '#a6c',
+                borderColor: '#a6c',
+                data: [15, 5, 4, 2, 1]
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+
+    var profitChart = document.getElementById("profit-chart").getContext('2d');
+    var chart = new Chart(profitChart, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8', 'Month 9', 'Month 10', 'Month 11', 'Month 12'],
+            datasets: [{
+                label: 'Monthy Profit Last Twelve Months',
+                backgroundColor: '#a6c',
+                borderColor: '#a6c',
+                data: [-2500, 5225, 6652, -100, 0, 304, 3455, 0, -30, 100, 6500, 1000]
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+
+    var vacancyChart = document.getElementById("vacancy-chart").getContext('2d');
+    var chart = new Chart(vacancyChart, {
+        // The type of chart we want to create
+        type: 'pie',
+
+        // The data for our dataset
+        data: {
+            labels: ['Occupied', 'Vacant'],
+            datasets: [{
+                data: [85, 15],
+                backgroundColor: ['#17a2b8', '#dc3545']
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+
+    var loanChart = document.getElementById("loan-chart").getContext('2d');
+    var chart = new Chart(loanChart, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: ['2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020' ],
+            datasets: [{
+                label: 'Loan balance by year',
+                backgroundColor: '#a6c',
+                borderColor: '#a6c',
+                data: [1000000, 950000, 930000, 900200, 880000, 790000, 765000, 745000, 722000, 666000]
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+</script>

@@ -1,0 +1,149 @@
+﻿<input type="hidden" value="@Model.Property.Id" id="property-id" />
+<div id="service-request-1">
+    <label>Select Maintenance Type</label>
+    <select class="browser-default custom-select mb-4" id="maintenance-type">
+        <option value="">Choose option</option>
+        <option value="1">Pest Control / Extermination</option>
+        <option value="2">Lawncare</option>
+        <option value="3">Electrical</option>
+        <option value="4">Plumbing</option>
+        <option value="5">Inspection</option>
+    </select><br />
+    <span id="service-type-error" style="color:red; display:none;">This field is required.</span>
+    <!-- Subject -->
+    <label>Select Service Provider</label>
+    <select class="browser-default custom-select mb-4" id="service-provider-name">
+        <option value="">Choose option</option>
+        <option value="ABC Pest Control">ABC Pest Control</option>
+        <option value="Smith Lawncare">Smith Lawncare</option>
+        <option value="Electrician">Electrician</option>
+        <option value="Inspector">Inspector</option>
+    </select><br />
+    <span id="service-name-error" style="color:red; display:none;">This field is required.</span>
+    <!-- Email -->
+    <!-- Auto Fill with company email when user selects this-->
+    <input type="email" id="service-provider-email" class="form-control mb-4" placeholder="Service Provider Email"><br />
+    <span id="service-email-error" style="color:red; display:none;">This field is required.</span>
+
+    <!-- Priority -->
+    <label>Choose Priority Level</label>
+    <select class="browser-default custom-select mb-4" id="service-priority">
+        <option value="">Choose option</option>
+        <option value="Highest">Highest Priority</option>
+        <option value="High">High Priority</option>
+        <option value="Medium">Medium Priority</option>
+        <option value="Low">Low Priority</option>
+    </select><br />
+    <span id="priority-error" style="color:red; display:none;">This field is required.</span>
+    <!-- Message -->
+    <div class="form-group">
+        <textarea class="form-control rounded-0" id="service-message" rows="3" placeholder="Description of service needed"></textarea><br />
+        <span id="service-message-error" style="color:red; display:none;">This field is required.</span>
+    </div>
+
+    <!-- Send button -->
+    <button class="btn btn-info btn-block" type="button" id="maintenance-preview-button" onclick="ServiceRequestPreview()">Preview</button>
+    <!-- Default form contact -->
+</div>
+    <div id="service-request-2" style="display:none;">
+        @{ 
+            var subject = "Service Requested for Property at " + Model.Property.StreetAddress + "," + Environment.NewLine + Model.Property.City + ", " + Model.Property.State;
+        }
+        <p>Preview Message</p>
+        <p id="to-email"></p>
+        <p>CC: <span id="cc-email">@Model.UserEmail</span></p>
+        <p>Subject: <span id="subject">@subject</span></p>
+        <p id="message"></p>
+        <button class="btn btn-success btn-block" type="button" id="maintenance-send-button" onclick="SendServiceRequestEmail()" >Send Email</button>
+    </div>
+
+<script>
+     
+     function ServiceRequestPreview(){
+        var maintenanceType = $("#maintenance-type").val();
+        var providerName = $("#service-provider-name").val();
+        var providerEmail = $("#service-provider-email").val();
+         var serviceMessage = $("#service-message").val();
+         var priority = $("#service-priority").val();
+        if (ValidateMaintenanceRequestForm(maintenanceType, providerName, providerEmail, serviceMessage, priority)) {
+            // show preview email
+            $("#service-request-1").css("display", "none");
+            $("#service-type-error").css("display", "none");
+            $("#service-name-error").css("display", "none");
+            $("#service-email-error").css("display", "none");
+            $("#service-message-error").css("display", "none");
+            $("#priority-error").css("display", "none");
+            $("#service-request-2").css("display", "");
+            $("#to-email").text("To:" + providerEmail);
+            $("#message").text("Message:" + serviceMessage);
+        }
+    }
+
+    
+
+    function ValidateMaintenanceRequestForm(type, name, email, message, priority) {
+        if (type != "" && name != "" && email != "" && ValidateEmail(email) && message != "" && priority != "") {
+            return true;
+        }
+        else {
+            if (type == "") {
+                // show required message for type field
+                $("#service-type-error").css("display", "");
+            }
+            if (name == "") {
+                // show required message for provider name
+                $("#service-name-error").css("display", "");
+            }
+            if (email == "") {
+                // show required field for provider email
+                $("#service-email-error").css("display", "");
+            }
+            if (message == "") {
+                // show required field for service message
+                $("#service-message-error").css("display", "");
+            }
+            if (priority == "") {
+                $("#priority-error").css("display", "");
+            }
+            return false;
+        }
+    }
+    function ValidateEmail(email) {
+        // change this
+        return true;
+    }
+
+    function SendServiceRequestEmail(email) {
+        var maintenanceCategory = $("#maintenance-type").val();
+        var companyName = $("#service-provider-name").val();
+        var companyEmail = $("#service-provider-email").val();
+        var ccEmail = $("#cc-email").text();
+        var message = $("#service-message").val();
+        var subject = $("#subject").text();
+        var propertyId = $("#property-id").val();
+
+
+        $.get({
+            url: "https://localhost:5001/ServiceRequestAjax/SendServiceRequestEmail",
+            data: {
+                companyName: companyName,
+                companyEmail: companyEmail,
+                ccEmail: ccEmail,
+                maintenanceCategory: maintenanceCategory,
+                propertyId: propertyId,
+                subject: subject,
+                message: message
+            }
+
+        })
+            .done(() => {
+                alert('success');
+            })
+            .fail(() => {
+                alert('failure');
+            })
+    }
+
+
+
+</script>

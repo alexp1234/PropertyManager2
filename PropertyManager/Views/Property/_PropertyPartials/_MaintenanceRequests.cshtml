@@ -1,0 +1,26 @@
+﻿<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Date Requested</th>
+                <th scope="col">Submitter Email</th>
+                <th scope="col">General Problem Type</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Full Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var request in Model.MaintenanceRequests)
+            {
+                    <tr>
+                        <td>@request.RequestSentDate.ToString()</td>
+                        <td>@request.SubmitterEmail</td>
+                        <td>@request.MaintenanceType</td>
+                        <td>@request.Priority</td>
+                        <td><a href="#">Link</a></td>
+                    </tr>
+            }
+
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,204 @@
+﻿@using PropertyManager.ViewModels
+@model PropertyDetailsVM
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="jumbotron jumbotron-fluid">
+    @Html.ActionLink("Back to all Properties", "Properties", "Dashboard", null, new { @style = "margin-left:2%;" })
+    <div class="container">
+        <h2 class="display-4">@Model.Property.StreetAddress</h2>
+        <p class="lead">@Model.Property.City, @Model.Property.State</p>
+        @if (Model.Property.IsVacant)
+        {
+            <p>Current Status: <span style="color:red">Vacant</span></p>
+        }
+        else
+        {
+            <p>Current Status: <span style="color:green">Occupied</span></p>
+        }
+    </div>
+
+</div>
+<div id="dashboard-div">
+    <div class="row">
+        <a href="#">
+            <div class="span3" style="margin-right:10px; margin-bottom:10px; margin-left:10px;">
+                <div class="card" style="background-color:#17a2b8">
+                    <div class="card-body" style="color:white;">
+                        <h4 class="card-title"><i class="fas fa-hammer ml-2"></i>&nbsp;&nbsp;Manage Services</h4>
+                        <p style="color:white;" class="card-text">Schedule and manage routine and non-routine maintenance for this property</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item" onclick="DetailsTabNavigation('maintenance-open')">View Open Service Requests</li>
+                            <li class="list-group-item" onclick="DetailsTabNavigation('maintenance-all')">View All Service Requests</li>
+                            <li class="list-group-item" onclick="DetailsTabNavigation('schedule-maintenance')">Schedule Maintenance</li>
+                            <li class="list-group-item">Add Service Providers</li>
+                            <li class="list-group-item">Send Service Request</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <a href="#">
+            <div class="span3" style="margin-right:10px; margin-bottom:10px;">
+                <div class="card" style="background-color:#17a2b8">
+                    <div class="card-body" style="color:white;">
+                        <h4 class="card-title"><i class="fas fa-dollar-sign ml-2"></i>&nbsp;&nbsp;Financial Information</h4>
+                        <p style="color:white;" class="card-text">View and manage financial information for this property</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">View Profit/Loss</li>
+                            <li class="list-group-item">View Loan Information</li>
+                            <li class="list-group-item">View Rent Information</li>
+                            <li class="list-group-item">View Itemized Expense</li>
+                            <li class="list-group-item">View Occupancy History</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </a>
+        @if (Model.Property.IsVacant)
+        {
+            <a href="#">
+                <div class="span3" style="margin-bottom:10px;">
+                    <div class="card" style="background-color:#17a2b8">
+                        <div class="card-body" style="color:white;">
+                            <h4 class="card-title">
+                                Listing Information
+                            </h4>
+                            <p class="card-text" style="color:white;">
+                                This property is vacant. But it doesn't have to be! Manage the complete property listing and tenant screening process.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">Property Listing Status</li>
+                                <li class="list-group-item">Rent Applications</li>
+                                <li class="list-group-item">Tenant Screening Criteria</li>
+                                <li class="list-group-item">Lease Information</li>
+                                <li class="list-group-item">Documents</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+        else
+        {
+            <a href="#">
+                <div class="span3" style="margin-bottom:10px;">
+                    <div class="card" style="background-color:#17a2b8">
+                        <div class="card-body" style="color:white;">
+                            <h4 class="card-title"><i class="fas fa-user mr-3"></i>&nbsp;&nbsp;Tenant Information</h4>
+                            <p class="card-text" style="color:white;">
+                                View this property's current Tenant's personal and lease information.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">Tenant Overview</li>
+                                <li class="list-group-item">Lease Information</li>
+                                <li class="list-group-item">Tenant Screening Criteria</li>
+                                <li class="list-group-item">Tenant History</li>
+                                <li class="list-group-item">Documents</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+        }
+    </div>
+
+</div>
+
+<div id="open-maintenance-div" style="display:none;">
+    <div class="card">
+        <div class="card-body">
+            <a onclick="DetailsTabNavigation('overview')"><i class="fas fa-arrow-left"></i>&nbsp;&nbsp;Back</a><h4 class="card-title">&nbsp;&nbsp;Open Service Requests for @Model.Property.StreetAddress</h4>
+            <partial name="_PropertyPartials/_OpenMaintenanceRequests.cshtml" />
+        </div>
+    </div>
+
+</div>
+<div id="all-maintenance-div" style="display:none;">
+    <div class="card">
+        <div class="card-body">
+            <a onclick="DetailsTabNavigation('overview')"><i class="fas fa-arrow-left"></i>&nbsp; &nbsp;Back</a><h4 class="card-title">&nbsp;&nbsp; All Service Requests for @Model.Property.StreetAddress</h4>
+            <partial name="_PropertyPartials/_MaintenanceRequests.cshtml" />
+        </div>
+    </div>
+</div>
+<div id="schedule-maintenance-div" style="display:none;">
+    <div class="card">
+        <div class="card-body">
+            <a onclick="DetailsTabNavigation('overview')"><i class="fas fa-arrow-left"></i>&nbsp; &nbsp;Back</a><h4 class="card-title">&nbsp;&nbsp; Send Service Request for @Model.Property.StreetAddress</h4>
+            <partial name="_PropertyPartials/_ScheduleMaintenance.cshtml" />
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    localStorage.setItem("CurrentPage", "overview")
+    function DetailsTabNavigation(target) {
+        switch (target) {
+            case "overview":
+                $("#dashboard-div").css("display", "");
+                HideCurrent();
+                localStorage.setItem("CurrentPage", "overview");
+                break;
+            case "maintenance-open":
+                $("#open-maintenance-div").css("display", "");
+                HideCurrent();
+                localStorage.setItem("CurrentPage", "maintenance-open");
+                break;
+            case "maintenance-all":
+                $("#all-maintenance-div").css("display", "");
+                HideCurrent();
+                localStorage.setItem("CurrentPage", "maintenance-all");
+                break;
+            case "schedule-maintenance":
+                $("#schedule-maintenance-div").css("display", "");
+                HideCurrent();
+                LoadProviders();
+                localStorage.setItem("CurrentPage", "schedule-maintenance");
+                break;
+
+        }
+    }
+
+    function HideCurrent() {
+        switch (localStorage.getItem("CurrentPage")) {
+            case "overview":
+                $("#dashboard-div").css("display", "none");
+                break;
+            case "maintenance-open":
+                $("#open-maintenance-div").css("display", "none");
+                break;
+            case "maintenance-all":
+                $("#all-maintenance-div").css("display", "none");
+                break;
+            case "schedule-maintenance":
+                $("#schedule-maintenance-div").css("display", "none");
+                break;
+
+        }
+    }
+
+    function LoadProviders() {
+
+    }
+</script>

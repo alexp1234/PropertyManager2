@@ -1,0 +1,23 @@
+﻿@model PropertyManager.ViewModels.ServiceResponseViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Respond to Service Request</title>
+</head>
+<body>
+    <h1>Respond to service request</h1>
+    <p>Service has been requested for @Model.PropertyAddress</p>
+    <p>Problem Category: @Model.ProblemCategory</p>
+    <p>Problem Full Description: @Model.ProblemFullDescription</p>
+    <p>Requested Date for Service: @Model.RequestedDateAndTime</p>
+    <button>Accept</button>
+    <button>Decline</button>
+
+    
+</body>
+</html>
